@@ -6,7 +6,12 @@ from modules import ocr, metadata, forensic, validation, signature, blockchain, 
 import fitz  # PyMuPDF
 from PIL import Image
 import pytesseract
+
+pytesseract.pytesseract.tesseract_cmd = (
+    r"path"
+)
 import pandas as pd
+
 
 app = FastAPI()
 UPLOAD_FOLDER = "data/documents"
