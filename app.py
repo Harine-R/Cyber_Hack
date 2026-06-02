@@ -111,6 +111,23 @@ def extract_content(filepath: str, file_type: str):
     except Exception as e:
         return {"error": f"Content extraction failed: {str(e)}"}
 
+def detect_doc_type(text):
+    text = text.lower()
+
+    if (
+        "uidai" in text
+        or "aadhaar" in text
+        or "government of india" in text
+        or "date of birth" in text
+        or validation.parse_aadhaar(text)
+    ):
+        return "aadhaar"
+
+    if "salary" in text or "employee" in text:
+        return "employee"
+
+    return "unknown"
+
 # Fraud check logic (returns structured analysis for each file)
 def run_fraud_checks(content, file_type, filepath: str, official_records: dict):
     # If extraction returned an error dict, propagate as analysis error
@@ -124,7 +141,10 @@ def run_fraud_checks(content, file_type, filepath: str, official_records: dict):
             text = content.get("text", "") if isinstance(content, dict) else str(content)
             forensic_results = forensic.check(filepath)
             metadata_results = metadata.extract(filepath)
-            validation_results = validation.cross_validate(text, official_records)
+            if "date of birth" in text.lower():
+                validation_results = validation.verify_aadhaar(text)
+            else:
+                validation_results = validation.cross_validate(text, official_records)
             signature_results = signature.verify(filepath, official_records)
 
             fraud_score, risk_level = scoring.calculate(
@@ -159,7 +179,15 @@ def run_fraud_checks(content, file_type, filepath: str, official_records: dict):
             text = content.get("text", "") if isinstance(content, dict) else str(content)
             img = content.get("img") if isinstance(content, dict) else None
 
-            validation_results = validation.cross_validate(text, official_records)
+            doc_type = detect_doc_type(text)
+
+            if doc_type == "aadhaar":
+                validation_results = validation.verify_aadhaar(text)
+            else:
+                validation_results = validation.cross_validate(
+                    text,
+                    official_records
+                )
 
             fraud_score = 0
             explanations = []

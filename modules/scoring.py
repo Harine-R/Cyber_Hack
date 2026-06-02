@@ -8,6 +8,17 @@ def calculate(forensic_results, validation_results, metadata_results, signature_
     if validation_results.get("salary_mismatch"): score += 50
     if validation_results.get("employee_not_found"): score += 100
     if validation_results.get("name_mismatch"): score += 20
+    if validation_results.get("aadhaar_missing"):
+        score += 40
+
+    if validation_results.get("dob_missing"):
+        score += 10
+
+    if validation_results.get("gender_missing"):
+        score += 10
+
+    if validation_results.get("uidai_keywords_missing"):
+        score += 20
 
     if signature_results.get("signature_anomaly"): score += 40
 

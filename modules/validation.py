@@ -54,3 +54,32 @@ def cross_validate(text: str, official_records: dict) -> dict:
                 results["salary_mismatch"] = True
 
     return results
+
+def parse_aadhaar(text):
+    aadhaar_pattern = r"\b\d{4}\s?\d{4}\s?\d{4}\b"
+    match = re.search(aadhaar_pattern, text)
+    return match.group(0) if match else None
+
+
+def verify_aadhaar(text):
+    results = {}
+
+    aadhaar = parse_aadhaar(text)
+
+    if not aadhaar:
+        results["aadhaar_missing"] = True
+
+    if "date of birth" not in text.lower():
+        results["dob_missing"] = True
+
+    if "male" not in text.lower() and "female" not in text.lower():
+        results["gender_missing"] = True
+
+    if (
+        "uidai" not in text.lower()
+        and "aadhaar" not in text.lower()
+        and "government of india" not in text.lower()
+    ):
+        results["uidai_keywords_missing"] = True
+
+    return results

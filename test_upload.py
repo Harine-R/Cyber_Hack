@@ -4,10 +4,11 @@ url = "http://127.0.0.1:8000/upload_and_analyze"
 
 # Multiple files
 files = [
-    ("files", open(r"filepath1", "rb")),
-    ("files", open(r"filepath2", "rb")),
-    ("files", open(r"filepath3", "rb")),
-    ("files", open(r"filepath4", "rb"))
+    ("files", open(r"path", "rb")),
+    ("files", open(r"path", "rb")),
+    ("files", open(r"path", "rb")),
+    ("files", open(r"path", "rb")),
+    ("files", open(r"path", "rb"))
 ]
 
 response = requests.post(url, files=files)
