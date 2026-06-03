@@ -8,7 +8,7 @@ from PIL import Image
 import pytesseract
 
 pytesseract.pytesseract.tesseract_cmd = (
-    r"path"
+    r"C:\Users\Vijayashree B\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"
 )
 import pandas as pd
 
@@ -84,11 +84,15 @@ def extract_content(filepath: str, file_type: str):
         elif file_type == "image":
             try:
                 img = Image.open(filepath)
-                text = pytesseract.image_to_string(img)
+
+        # Use your custom OCR module
+                text = ocr.extract_text(filepath)
+
                 if not text.strip():
                     return {"error": "OCR failed: No readable text found"}
-                # Return both text and image object for later metadata extraction
+
                 return {"text": text, "img": img}
+
             except Exception as e:
                 return {"error": f"OCR failed: {str(e)}"}
 
@@ -191,12 +195,30 @@ def run_fraud_checks(content, file_type, filepath: str, official_records: dict):
 
             fraud_score = 0
             explanations = []
+
             if validation_results.get("salary_mismatch"):
                 fraud_score += 50
                 explanations.append("Salary mismatch detected in OCR text")
+
             if validation_results.get("employee_not_found"):
                 fraud_score += 100
                 explanations.append("Employee not found in OCR text")
+
+            if validation_results.get("aadhaar_missing"):
+                fraud_score += 40
+                explanations.append("Aadhaar number missing")
+
+            if validation_results.get("dob_missing"):
+                fraud_score += 10
+                explanations.append("Date of birth missing")
+
+            if validation_results.get("gender_missing"):
+                fraud_score += 10
+                explanations.append("Gender missing")
+
+            if validation_results.get("uidai_keywords_missing"):
+                fraud_score += 20
+                explanations.append("UIDAI keywords missing")
 
             risk_level = "Low Risk" if fraud_score < 30 else "Medium Risk" if fraud_score < 60 else "High Risk"
 

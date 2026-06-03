@@ -10,15 +10,18 @@ def calculate(forensic_results, validation_results, metadata_results, signature_
     if validation_results.get("name_mismatch"): score += 20
     if validation_results.get("aadhaar_missing"):
         score += 40
-
+        print("Aadhaar number is missing.")
     if validation_results.get("dob_missing"):
         score += 10
+        print("Date of birth is missing.")
 
     if validation_results.get("gender_missing"):
         score += 10
+        print("Gender information is missing.")
 
     if validation_results.get("uidai_keywords_missing"):
         score += 20
+        print("UIDAI-related keywords are missing.")
 
     if signature_results.get("signature_anomaly"): score += 40
 
